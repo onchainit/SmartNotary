@@ -89,24 +89,20 @@ window.App = {
         
         var file = document.getElementById("file").files[0];
         if(file) {
-            var owner = document.getElementById("owner").value;
-            if(owner == "") {
-            alert("Please enter owner name");
-            } else {
                 var reader = new FileReader();
                 reader.onload = function (event) {
                     var fileHash = sha1(event.target.result);
                     SmartNotary.deployed().then(function(instance) {
-                       return instance.set(owner, fileHash);
+                       return instance.set(fileHash);
                     }).then(function(result) {
-                        self.setStatus("added fileHash" + fileHash + "<br>owner:" + owner + "<br>result:" + JSON.stringify(result, null, 4));
+                        self.setStatus("added fileHash" + fileHash + "<br>result:" + JSON.stringify(result, null, 4));
                     }).catch(function(e) {
                         console.log(e);
                         self.setStatus("Error invoking contract; see log.");
                     });
                 };
                 reader.readAsText(file);
-            }
+
         } else {
             alert("Please select a file");
         }
