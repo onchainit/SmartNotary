@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+shrink-to-fit=no">
+    <script src="./app.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 text-xs-center">
+            <br>
+            <h3>Upload any file</h3>
+            <br>
+            <div>
+                <div class="input">
+                    <label class="custom-file text-xs-left">
+                        <input type="file" id="file" class="input">
+                        <span class="custom-file-control"></span>
+                    </label>
+                </div>
+                <div class="input">
+                    <label for="owner">Enter owner name</label>
+                    <input type="text" class="input" id="owner">
+                </div>
+                <button onclick="App.set()" class="button">Submit</button>
+                <button onclick="App.get()" class="button">Get Info</button>
+                <br><br>
+                <div class="alert alert-info" role="alert" id="message">
+                    You can either submit file's details or get
+                    information about it.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+<span id="status"></span>
+<br>
+<span class="hint"><strong>Hint:</strong> open the browser developer console to view any errors and warnings.</span>
+</body>
+</html>
