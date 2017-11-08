@@ -78,10 +78,36 @@ contract('SmartNotary', function(accounts) {
         return instance.withdraw({from:web3.eth.accounts[0]});
         }).then(function() {
          assert.equal(web3.eth.getBalance(instance.address).valueOf(), 0, "Contract balance wasn't 0");
-         //assert.equal(parseInt(web3.eth.getBalance(web3.eth.accounts[1])), expectingAccount0Balance, "Account 1 balance wasn't incremented by withdraw:" + web3.eth.getBalance(web3.eth.accounts[1]).valueOf());
         });
 
     });
+
+  it("should receive bids", function() {
+      var instance;
+      var expectingBalance = web3.toWei("15", "ether");
+
+
+      return SmartNotary.deployed().then(function(_instance) {
+          instance = _instance;
+          instance.offer("myHash", {from:web3.eth.accounts[1], value: web3.toWei("5", "ether")});
+          return instance.offer("myHash", {from:web3.eth.accounts[2], value: web3.toWei("10", "ether")});
+          }).then(function() {
+           assert.equal(web3.eth.getBalance(instance.address).valueOf(), expectingBalance, "Contract balance wasn't 15");
+          });
+  });
+
+  it("should accept a bid", function() {
+        var instance;
+        var expectingBalance = web3.toWei("0.1", "ether");
+
+        return SmartNotary.deployed().then(function(_instance) {
+            instance = _instance;
+            return instance.acceptOffer("myHash", web3.eth.accounts[2], {from:web3.eth.accounts[0]});
+            }).then(function() {
+             assert.equal(web3.eth.getBalance(instance.address).valueOf(), expectingBalance, "Contract balance wasn't 5.1");
+            });
+    });
+
 
   
 });
