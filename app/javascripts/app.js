@@ -78,7 +78,15 @@ window.App = {
         alert("Please select a file");
       }
   },
-  
+
+  withdraw: function() {
+      var self = this;
+      SmartNotary.deployed().then(function(instance) {
+          return instance.withdraw();
+      }).then(function(data){
+          self.setStatus("withdraw processed<br>result:" + JSON.stringify(result, null, 4));
+      });
+  },
 
   set: function() {
         var self = this;
@@ -93,7 +101,7 @@ window.App = {
                 reader.onload = function (event) {
                     var fileHash = sha1(event.target.result);
                     SmartNotary.deployed().then(function(instance) {
-                       return instance.set(fileHash);
+                       return instance.set(fileHash, {value: web3.toWei(document.getElementById("amount").value, "ether")});
                     }).then(function(result) {
                         self.setStatus("added fileHash" + fileHash + "<br>result:" + JSON.stringify(result, null, 4));
                     }).catch(function(e) {
