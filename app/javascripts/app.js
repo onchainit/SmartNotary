@@ -49,16 +49,92 @@ window.App = {
     status.innerHTML = message;
   },
   
-  setTxMessage: function(data, hash) {
+  setMessage: function(data, hash) {
       if(data[0] == 0 && data[1] == "") {
           self.setStatus("File not found");
       } else {
           var newDate = new Date();
           newDate.setTime(data[0]*1000);
           var dateString = newDate.toUTCString();
-          this.setStatus("Timestamp: " + dateString + "<br>Owner: " + data[1] + "<br>file hash:" + hash);
+          var infoString = "Timestamp: " + dateString + "<br>Owner: " + data[1] + "<br>file hash:" + hash + "<br><br>"
+          var bidString;
+          if (data[4] == true) {
+            var bidString = "Offers received: " + data[3].length
+            for (var i=0; i < data[3].length; i++) {
+              bidString= bidString + "<br>" + web3.fromWei(data[3][i], "ether") +
+                "<br>from address: <span id=\"offerAdr\">" + data[2][i] + "</span>" +
+                "<button onclick=\"App.accept(document.getElementById('offerAdr').innerHTML)\" class=\"button\">accept</button>"
+            }
+
+          } else {
+            var bidString = "Your Bid: " + web3.fromWei(data[3][0], "ether") +
+                            "<br>your address: " + data[2][0] + "<br><br>" +
+                            "Make a Bid: <label for=\"amount\">Enter amount (consider 0.1 eth as fee)</label> " +
+                            "<input type=\"text\" class=\"input\" id=\"bidAmount\">" +
+                            "<button onclick=\"App.offer(document.getElementById('bidAmount').value)\" class=\"button\">bid</button>"
+          }
+
+          this.setStatus(infoString + bidString);
       }
   },
+
+  accept: function(address) {
+            var self = this;
+
+            this.setStatus("Initiating transaction... (please wait)");
+
+            var meta;
+
+            var file = document.getElementById("file").files[0];
+            if(file) {
+                    var reader = new FileReader();
+                    reader.onload = function (event) {
+                        var fileHash = sha1(event.target.result);
+                        SmartNotary.deployed().then(function(instance) {
+                           return instance.acceptOffer(fileHash, address);
+                        }).then(function(result) {
+                            self.setStatus("Accepted a bid for fileHash" + fileHash + "<br>result:" + JSON.stringify(result, null, 4));
+                        }).catch(function(e) {
+                            console.log(e);
+                            self.setStatus("Error invoking contract; see log.");
+                        });
+                    };
+                    reader.readAsText(file);
+
+            } else {
+                alert("Please select a file");
+            }
+    },
+
+
+  offer: function(bidAmount) {
+          var self = this;
+
+          this.setStatus("Initiating transaction... (please wait)");
+
+          var meta;
+
+          var file = document.getElementById("file").files[0];
+          if(file) {
+                  var reader = new FileReader();
+                  reader.onload = function (event) {
+                      var fileHash = sha1(event.target.result);
+                      SmartNotary.deployed().then(function(instance) {
+                         return instance.offer(fileHash, {value: web3.toWei(bidAmount, "ether")});
+                      }).then(function(result) {
+                          self.setStatus("Pushed a bid for fileHash" + fileHash + "<br>result:" + JSON.stringify(result, null, 4));
+                      }).catch(function(e) {
+                          console.log(e);
+                          self.setStatus("Error invoking contract; see log.");
+                      });
+                  };
+                  reader.readAsText(file);
+
+          } else {
+              alert("Please select a file");
+          }
+  },
+
 
   get: function() {
       var self = this;
@@ -70,7 +146,7 @@ window.App = {
             SmartNotary.deployed().then(function(instance) {
                 return instance.get(hash);
             }).then(function(data){
-                self.setTxMessage(data, hash);
+                self.setMessage(data, hash);
         });
         };
         reader.readAsText(file);
