@@ -19,9 +19,16 @@ shrink-to-fit=no">
                         <span class="custom-file-control"></span>
                     </label>
                 </div>
+                <div class="input">
+                    <label for="amount">Enter amount fee (min 0.1 eth)</label>
+                    <input type="text" class="input" id="amount">
+                </div>
                 <button onclick="App.set()" class="button">Submit</button>
                 <button onclick="App.get()" class="button">Get Info</button>
                 <br><br>
+                <button onclick="App.withdraw()" class="button">Withdraw (only Notary contract owner)</button>
+                <br><br>
+
                 <div class="alert alert-info" role="alert" id="message">
                     You can either submit file's details or get
                     information about it.
