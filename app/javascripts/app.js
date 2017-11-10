@@ -159,7 +159,7 @@ window.App = {
       var self = this;
       SmartNotary.deployed().then(function(instance) {
           return instance.withdraw();
-      }).then(function(data){
+      }).then(function(result){
           self.setStatus("withdraw processed<br>result:" + JSON.stringify(result, null, 4));
       });
   },
